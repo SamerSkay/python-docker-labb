@@ -40,7 +40,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t fastapi-demo:ci .
 
-  build-and-push:
+    build-and-push:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
@@ -54,8 +54,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set image name
-        run: echo "IMAGE=ghcr.io/${{ github.repository }}/fastapi-demo" >> $GITHUB_ENV
+      - name: Set image name (lowercase)
+        run: |
+          echo "IMAGE=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')/fastapi-demo" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -65,3 +66,4 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ github.sha }}
+
